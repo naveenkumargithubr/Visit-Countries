@@ -1,3 +1,5 @@
+import {Component} from 'react'
+import CountryItem from './components/CountryItem'
 import Countries from './components/Countries'
 import './App.css'
 
@@ -77,6 +79,77 @@ const initialCountriesList = [
 ]
 
 // Replace your code here
-const App = () => <Countries list={initialCountriesList} />
+class App extends Component {
+  state = {
+    countriesList: initialCountriesList,
+  }
+
+  getVisitedCountries = countriesList =>
+    countriesList.filter(eachCountry => eachCountry.isVisited === true)
+
+  markCountryAsVisited = id => {
+    this.setState(prevState => ({
+      countriesList: [
+        ...prevState.countriesList.map(eachItem => {
+          if (id === eachItem.id) {
+            return {...eachItem, isVisited: !prevState.isVisited}
+          }
+          return {...eachItem}
+        }),
+      ],
+    }))
+  }
+
+  removeVisitedCountry = id => {
+    this.setState(prevState => ({
+      countriesList: [
+        ...prevState.countriesList.map(eachItem => {
+          if (id === eachItem.id) {
+            return {...eachItem, isVisited: false}
+          }
+          return {...eachItem}
+        }),
+      ],
+    }))
+  }
+
+  render() {
+    const {countriesList} = this.state
+    // console.log(countriesList)
+    const visitedCountries = this.getVisitedCountries(countriesList)
+    console.log(visitedCountries)
+    return (
+      <div className="home-page-bg-container">
+        <h1 className="countries-head">Countries</h1>
+        <ul className="all-countries-list">
+          {countriesList.map(eachItem => (
+            <CountryItem
+              markCountryAsVisited={this.markCountryAsVisited}
+              countryDetails={eachItem}
+              key={eachItem.id}
+            />
+          ))}
+        </ul>
+        <h1 className="countries-heading">Visited Countries</h1>
+
+        {visitedCountries.length === 0 ? (
+          <div className="no-countries-bg-container">
+            <p className="show-empty-text">No Countries Visited Yet!</p>
+          </div>
+        ) : (
+          <ul className="visited-countries-container">
+            {visitedCountries.map(eachCountry => (
+              <Countries
+                removeVisitedCountry={this.removeVisitedCountry}
+                countryDetails={eachCountry}
+                key={eachCountry.id}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+    )
+  }
+}
 
 export default App
